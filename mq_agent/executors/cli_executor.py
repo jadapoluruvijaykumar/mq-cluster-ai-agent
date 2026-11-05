@@ -87,3 +87,4 @@ class CLIExecutor(BaseMQExecutor):
                 stderr=str(e),
                 return_code=-1
             )
+

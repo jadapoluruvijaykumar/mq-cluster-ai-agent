@@ -143,3 +143,4 @@ class ClusterValidator:
             result.recommendations.append(
                 "Cluster queues will be defined with DEFBIND(NOTFIXED) to ensure message-by-message workload balancing."
             )
+

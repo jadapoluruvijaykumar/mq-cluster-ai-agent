@@ -25,3 +25,4 @@ MQ_HTTP_VERIFY_SSL = os.getenv("MQ_HTTP_VERIFY_SSL", "false").lower() == "true"
 MQ_DEFAULT_PORT = int(os.getenv("MQ_DEFAULT_PORT", "1414"))
 MQ_REST_DEFAULT_PORT = int(os.getenv("MQ_REST_DEFAULT_PORT", "9443"))
 MQ_DOCKER_IMAGE = os.getenv("MQ_DOCKER_IMAGE", "icr.io/ibm-com/mq:latest")
+

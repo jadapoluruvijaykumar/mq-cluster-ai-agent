@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IBM MQ Cluster AI Agent - Console & Architect</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    :root {
+      --bg-dark: #0f172a;
+      --card-bg: #1e293b;
+      --border-color: #334155;
+      --primary-color: #38bdf8;
+      --accent-fr: #f59e0b;
+      --accent-pr: #0ea5e9;
+    }
+    body {
+      background-color: var(--bg-dark);
+      color: #f8fafc;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    .card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+    }
+    .badge-fr {
+      background-color: #d97706;
+      color: #fff;
+    }
+    .badge-pr {
+      background-color: #0284c7;
+      color: #fff;
+    }
+    pre code {
+      color: #38bdf8;
+      font-family: Consolas, "Courier New", monospace;
+    }
+    .chat-box {
+      height: 480px;
+      overflow-y: auto;
+      background: #0b1120;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 16px;
+    }
+    .chat-msg-user {
+      background-color: #1e3a8a;
+      border-radius: 12px 12px 0 12px;
+      padding: 10px 14px;
+      margin-bottom: 12px;
+      max-width: 80%;
+      margin-left: auto;
+    }
+    .chat-msg-agent {
+      background-color: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 12px 12px 12px 0;
+      padding: 12px 16px;
+      margin-bottom: 12px;
+      max-width: 90%;
+    }
+    .node-card {
+      background: #111827;
+      border: 1px solid #374151;
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 12px;
+      transition: transform 0.2s;
+    }
+    .node-card:hover {
+      border-color: #38bdf8;
+      transform: translateY(-2px);
+    }
+  </style>
+</head>
+<body class="p-3">
+
+<div class="container-fluid">
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom border-secondary">
+    <div>
+      <h3 class="mb-0 text-info"><i class="fa-solid fa-server me-2"></i>IBM MQ Cluster AI Agent</h3>
+      <small class="text-secondary">Powered by FastAPI & LangGraph</small>
+    </div>
+    <div>
+      <span class="badge bg-success"><i class="fa-solid fa-circle-check me-1"></i>LangGraph Agent Ready</span>
+      <a href="/docs" target="_blank" class="btn btn-sm btn-outline-info ms-2"><i class="fa-solid fa-code me-1"></i>OpenAPI Specs</a>
+    </div>
+  </div>
+
+  <div class="row g-3">
+    <!-- Left: Interactive Chat with AI Agent -->
+    <div class="col-lg-6">
+      <div class="card h-100 p-3">
+        <h5 class="card-title text-light"><i class="fa-solid fa-robot me-2 text-info"></i>Cluster Architect AI Chat</h5>
+        <p class="text-secondary small mb-2">Ask in plain English to plan clusters, generate MQSC, or troubleshoot errors.</p>
+        
+        <div id="chatBox" class="chat-box mb-3">
+          <div class="chat-msg-agent">
+            <strong>IBM MQ Agent:</strong><br>
+            Hello! I am your IBM MQ Cluster AI Agent. Try asking:
+            <ul class="mb-0 mt-2">
+              <li><em>"Create cluster PAYMENT_CLUS with FR QM1, QM2 and PR QM3 and queue ORDERS.IN"</em></li>
+              <li><em>"Diagnose AMQ9448 repository error"</em></li>
+              <li><em>"Diagnose channel retrying state"</em></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="input-group">
+          <input type="text" id="userInput" class="form-control bg-dark text-light border-secondary" placeholder="Type prompt (e.g. Create cluster PROD_CLUS with FR QM1, QM2 and PR QM3)...">
+          <button id="sendBtn" class="btn btn-info px-4"><i class="fa-solid fa-paper-plane me-1"></i>Send</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Visual Topology & Generated MQSC -->
+    <div class="col-lg-6">
+      <!-- Tabs -->
+      <ul class="nav nav-tabs border-secondary mb-3" id="mainTab" role="tablist">
+        <li class="nav-item">
+          <button class="nav-link active text-info" id="topo-tab" data-bs-toggle="tab" data-bs-target="#topo-pane">Topology Visualizer</button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-link text-info" id="mqsc-tab" data-bs-toggle="tab" data-bs-target="#mqsc-pane">MQSC Scripts</button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-link text-info" id="docker-tab" data-bs-toggle="tab" data-bs-target="#docker-pane">Docker Lab</button>
+        </li>
+      </ul>
+
+      <div class="tab-content">
+        <!-- Topology Pane -->
+        <div class="tab-pane fade show active" id="topo-pane">
+          <div class="card p-3">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h5 class="mb-0" id="currentClusterTitle">Active Cluster: None</h5>
+              <div id="valStatusBadge"></div>
+            </div>
+            
+            <div id="nodesContainer" class="row g-2">
+              <div class="text-secondary text-center py-5">
+                <i class="fa-solid fa-network-wired fa-2x mb-2"></i><br>
+                No cluster planned yet. Type a request into the chat to generate!
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MQSC Scripts Pane -->
+        <div class="tab-pane fade" id="mqsc-pane">
+          <div class="card p-3">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <select id="mqscSelector" class="form-select form-select-sm w-50 bg-dark text-light border-secondary"></select>
+              <button id="copyMqscBtn" class="btn btn-sm btn-outline-info"><i class="fa-solid fa-copy me-1"></i>Copy MQSC</button>
+            </div>
+            <pre class="bg-dark p-3 rounded border border-secondary" style="max-height: 400px; overflow-y: auto;"><code id="mqscCode">-- No MQSC generated yet --</code></pre>
+          </div>
+        </div>
+
+        <!-- Docker Lab Pane -->
+        <div class="tab-pane fade" id="docker-pane">
+          <div class="card p-3">
+            <h6 class="text-info"><i class="fa-brands fa-docker me-2"></i>Multi-Node IBM MQ Sandbox</h6>
+            <p class="small text-secondary">A containerized 3-node cluster running official IBM MQ images.</p>
+            <div class="alert alert-dark border-secondary p-2 mb-2">
+              <strong>Quick Start:</strong>
+              <pre class="mb-0 mt-1"><code>cd output/docker && docker compose up -d</code></pre>
+            </div>
+            <pre class="bg-dark p-3 rounded border border-secondary" style="max-height: 280px; overflow-y: auto;"><code id="dockerCode"># Run a cluster command to generate compose file</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  let generatedScripts = {};
+
+  async function sendChat() {
+    const input = document.getElementById('userInput');
+    const text = input.value.trim();
+    if (!text) return;
+
+    appendMessage('User', text, true);
+    input.value = '';
+
+    try {
+      const resp = await fetch('/api/chat', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ message: text })
+      });
+      const data = await resp.json();
+
+      appendMessage('IBM MQ Agent', data.response, false);
+
+      if (data.topology) {
+        renderTopology(data.topology, data.validation);
+      }
+      if (data.scripts) {
+        renderScripts(data.scripts);
+      }
+      if (data.docker_path) {
+        fetchDockerCompose();
+      }
+    } catch (e) {
+      appendMessage('System', 'Error connecting to agent: ' + e.message, false);
+    }
+  }
+
+  function appendMessage(sender, msg, isUser) {
+    const box = document.getElementById('chatBox');
+    const div = document.createElement('div');
+    div.className = isUser ? 'chat-msg-user' : 'chat-msg-agent';
+    
+    // Simple markdown-like line break replace
+    const formatted = msg.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    div.innerHTML = `<strong>${sender}:</strong><br>${formatted}`;
+    box.appendChild(div);
+    box.scrollTop = box.scrollHeight;
+  }
+
+  function renderTopology(top, val) {
+    document.getElementById('currentClusterTitle').innerHTML = `Cluster: <span class="text-info">${top.cluster_name}</span>`;
+    
+    const valBadge = document.getElementById('valStatusBadge');
+    if (val && val.is_valid) {
+      valBadge.innerHTML = `<span class="badge bg-success"><i class="fa-solid fa-check me-1"></i>HA Validated</span>`;
+    } else {
+      valBadge.innerHTML = `<span class="badge bg-warning text-dark"><i class="fa-solid fa-exclamation-triangle me-1"></i>Warnings</span>`;
+    }
+
+    const container = document.getElementById('nodesContainer');
+    container.innerHTML = '';
+
+    for (const [name, node] of Object.entries(top.nodes)) {
+      const isFR = node.role === 'FR';
+      const badgeClass = isFR ? 'badge-fr' : 'badge-pr';
+      const roleName = isFR ? 'Full Repository (FR)' : 'Partial Repository (PR)';
+
+      const col = document.createElement('div');
+      col.className = 'col-md-6';
+      col.innerHTML = `
+        <div class="node-card">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <h6 class="mb-0 text-light fw-bold">${node.name}</h6>
+            <span class="badge ${badgeClass} small">${roleName}</span>
+          </div>
+          <div class="small text-secondary mb-1">
+            <strong>Endpoint:</strong> <code>${node.host}:${node.port}</code>
+          </div>
+          <div class="small text-secondary mb-1">
+            <strong>CLUSRCVR:</strong> <code>${node.computed_clusrcvr_name || 'TO.' + node.name}</code>
+          </div>
+          <div class="small text-secondary">
+            <strong>CLUSSDR:</strong> <code>${(node.cluster_sender_targets || []).map(t => 'TO.' + t).join(', ') || 'None'}</code>
+          </div>
+        </div>
+      `;
+      container.appendChild(col);
+    }
+  }
+
+  function renderScripts(scripts) {
+    generatedScripts = scripts;
+    const selector = document.getElementById('mqscSelector');
+    selector.innerHTML = '';
+
+    for (const key of Object.keys(scripts)) {
+      const opt = document.createElement('option');
+      opt.value = key;
+      opt.innerText = key.endsWith('.mqsc') ? key : `${key}.mqsc`;
+      selector.appendChild(opt);
+    }
+
+    selector.onchange = () => {
+      document.getElementById('mqscCode').innerText = generatedScripts[selector.value] || '';
+    };
+
+    if (Object.keys(scripts).length > 0) {
+      selector.value = Object.keys(scripts)[0];
+      document.getElementById('mqscCode').innerText = Object.values(scripts)[0];
+    }
+  }
+
+  async function fetchDockerCompose() {
+    try {
+      const resp = await fetch('/api/cluster/docker-preview');
+      if (resp.ok) {
+        const text = await resp.text();
+        document.getElementById('dockerCode').innerText = text;
+      }
+    } catch (e) {}
+  }
+
+  document.getElementById('sendBtn').onclick = sendChat;
+  document.getElementById('userInput').onkeypress = (e) => { if (e.key === 'Enter') sendChat(); };
+  document.getElementById('copyMqscBtn').onclick = () => {
+    navigator.clipboard.writeText(document.getElementById('mqscCode').innerText);
+    alert('MQSC copied to clipboard!');
+  };
+</script>
+</body>
+</html>

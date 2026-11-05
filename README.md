@@ -179,3 +179,4 @@ for qm, result in sim_results.items():
 python -m pytest tests/
 ```
 All tests verify topology auto-wiring, channel name bounds, HA warnings, MQSC syntax, and Docker generation.
+

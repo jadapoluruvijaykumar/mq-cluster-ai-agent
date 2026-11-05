@@ -31,3 +31,4 @@ class BaseMQExecutor(ABC):
         Checks operational status of the specified queue manager.
         """
         pass
+

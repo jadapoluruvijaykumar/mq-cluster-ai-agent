@@ -18,3 +18,4 @@ pymqi>=1.12.0
 
 # Testing
 pytest>=8.0.0
+

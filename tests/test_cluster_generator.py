@@ -120,3 +120,4 @@ def test_diagnostics():
     retrying = diagnose("channel is in retrying status")
     assert len(retrying) >= 1
     assert "CHANNEL_RETRYING" in retrying[0].code_or_symptom
+

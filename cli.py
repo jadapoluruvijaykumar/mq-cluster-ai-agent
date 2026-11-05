@@ -204,8 +204,16 @@ def main():
     parser.add_argument("--queues", "-q", type=str, help="Cluster Queues (comma-separated)")
     parser.add_argument("--docker", action="store_true", help="Generate Docker Compose lab environment")
     parser.add_argument("--generate", action="store_true", help="Generate MQSC scripts to disk")
+    parser.add_argument("--serve", "-s", action="store_true", help="Launch FastAPI + LangGraph Web Server & UI")
+    parser.add_argument("--port", "-p", type=int, default=8000, help="Port for FastAPI server (default: 8000)")
 
     args = parser.parse_args()
+
+    if args.serve:
+        console.print(f"[bold cyan]Starting IBM MQ AI Agent API & Web UI on http://localhost:{args.port}...[/bold cyan]")
+        import uvicorn
+        uvicorn.run("api:app", host="127.0.0.1", port=args.port, reload=False)
+        return
     agent = MQClusterAgent(output_dir=OUTPUT_DIR)
 
     if args.cluster and args.fr:

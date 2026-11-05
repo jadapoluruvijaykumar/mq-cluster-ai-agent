@@ -136,3 +136,4 @@ def diagnose(query: str) -> List[DiagnosticAdvice]:
     Looks up diagnostics and troubleshooting recommendations for MQ cluster errors.
     """
     return ClusterDiagnostics.diagnose(query)
+

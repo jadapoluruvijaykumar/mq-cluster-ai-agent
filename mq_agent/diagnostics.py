@@ -106,3 +106,4 @@ class ClusterDiagnostics:
                 matches.append(cls.KNOWLEDGE_BASE["AMQ9448"])
 
         return matches
+

@@ -1,10 +1,10 @@
-# IBM MQ Cluster Local Docker Lab: PAYMENT_CLUS
+# IBM MQ Cluster Local Docker Lab: INVOICE_CLUS
 
 ## Cluster Overview
-- **Cluster Name**: `PAYMENT_CLUS`
+- **Cluster Name**: `INVOICE_CLUS`
 - **Full Repositories**: `QM1, QM2`
 - **Partial Repositories**: `QM3`
-- **Cluster Queues**: `PAYMENT.REQ`
+- **Cluster Queues**: `INVOICES.IN`
 
 ## Quickstart
 

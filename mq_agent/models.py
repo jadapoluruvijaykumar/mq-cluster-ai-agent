@@ -101,3 +101,4 @@ class ValidationResult(BaseModel):
     errors: List[str] = Field(default_factory=list)
     warnings: List[str] = Field(default_factory=list)
     recommendations: List[str] = Field(default_factory=list)
+
