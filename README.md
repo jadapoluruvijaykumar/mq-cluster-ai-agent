@@ -95,8 +95,28 @@ Open your browser at:
 
 ---
 
+## 🤖 Antigravity Skill Agent Integration
+
+This codebase is packaged directly as an **Antigravity Skill Agent** located in [`.agent/skills/ibm-mq-cluster/SKILL.md`](.agent/skills/ibm-mq-cluster/SKILL.md).
+
+### How It Works:
+1. **Progressive Disclosure**: Antigravity automatically detects the skill description whenever you or another agent asks about IBM MQ clustering.
+2. **Automatic Invocation**: You don't need to manually run scripts; you can simply ask in chat:
+   - *"Design an IBM MQ cluster with QM1 and QM2 as Full Repositories and QM3 as a Partial Repository."*
+   - *"Why is my cluster sender channel in RETRYING status?"*
+   - *"Generate a 3-node MQ cluster Docker compose file."*
+3. **Dedicated Subagent**:
+   - Registered as `ibm-mq-cluster-agent`.
+   - Antigravity can invoke it as an autonomous background subagent to handle long-running cluster deployments and verification workflows.
+
+---
+
 ```
 d:\IBM_MQ_Agent\
+├── .agent/
+│   └── skills/
+│       └── ibm-mq-cluster/
+│           └── SKILL.md          # Antigravity Workspace Skill definition
 ├── mq_agent/
 │   ├── __init__.py
 │   ├── models.py                 # Pydantic data models (Topology, QMgrNode, ChannelDef)
@@ -105,16 +125,21 @@ d:\IBM_MQ_Agent\
 │   ├── diagnostics.py            # Expert error diagnosis knowledge base
 │   ├── tools.py                  # Agent tool functions
 │   ├── agent.py                  # Orchestrator (Gemini / OpenAI / Offline Expert)
+│   ├── langgraph_agent.py        # LangGraph StateGraph agent workflow
 │   └── executors/
 │       ├── base.py               # Abstract executor interface
 │       ├── mock_executor.py      # Dry-run simulator
 │       ├── cli_executor.py       # runmqsc execution engine
 │       ├── rest_executor.py      # IBM MQ Admin REST API client
 │       └── docker_orchestrator.py# Docker Compose lab generator
+├── web/
+│   └── index.html                # Interactive single-page dashboard & topology viewer
+├── api.py                        # FastAPI backend application
 ├── cli.py                        # Rich interactive terminal UI
 ├── example.py                    # Programmatic Python example
 ├── tests/
-│   └── test_cluster_generator.py # Comprehensive unit test suite
+│   ├── test_cluster_generator.py # Core cluster generation tests
+│   └── test_api_and_langgraph.py # FastAPI & LangGraph integration tests
 ├── requirements.txt
 ├── config.py
 └── .env.example

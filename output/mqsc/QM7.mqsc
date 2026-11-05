@@ -1,0 +1,49 @@
+* ==================================================================
+* IBM MQ Cluster Setup Script for Queue Manager: QM7
+* Role: FULL REPOSITORY (FR)
+* Target Cluster: CLUST3
+* ==================================================================
+
+* 1. Configure TCP Listener
+DEFINE LISTENER('LISTENER.1414') TRPTYPE(TCP) PORT(1414) CONTROL(QMGR) REPLACE
+START LISTENER('LISTENER.1414')
+
+* 2. Designate this Queue Manager as a Full Repository
+ALTER QMGR REPOS('CLUST3')
+
+* 3. Cluster-Receiver Channel (CLUSRCVR)
+* Allows all cluster members to send cluster information and messages to QM7
+DEFINE CHANNEL('TO.QM7') +
+       CHLTYPE(CLUSRCVR) +
+       TRPTYPE(TCP) +
+       CONNAME('localhost(1414)') +
+       CLUSTER('CLUST3') +
+       DESCR('Cluster receiver channel for QM7') +
+       REPLACE
+
+* 4. Initial Cluster-Sender Channel(s) (CLUSSDR)
+* Used for initial cluster registration and discovery
+* [NOTICE] No CLUSSDR targets specified for this Queue Manager.
+
+* 5. Define Cluster Queues
+* Workload balancing is enabled using DEFBIND(NOTFIXED)
+DEFINE QLOCAL('Q8') +
+       CLUSTER('CLUST3') +
+       DEFBIND(NOTFIXED) +
+       DESCR('Cluster workload-balanced queue for CLUST3') +
+       REPLACE
+DEFINE QLOCAL('Q7') +
+       CLUSTER('CLUST3') +
+       DEFBIND(NOTFIXED) +
+       DESCR('Cluster workload-balanced queue for CLUST3') +
+       REPLACE
+DEFINE QLOCAL('Q6') +
+       CLUSTER('CLUST3') +
+       DEFBIND(NOTFIXED) +
+       DESCR('Cluster workload-balanced queue for CLUST3') +
+       REPLACE
+DEFINE QLOCAL('Q9') +
+       CLUSTER('CLUST3') +
+       DEFBIND(NOTFIXED) +
+       DESCR('Cluster workload-balanced queue for CLUST3') +
+       REPLACE

@@ -1,0 +1,62 @@
+* ==================================================================
+* IBM MQ Cluster Setup Script for Queue Manager: QM4
+* Role: PARTIAL REPOSITORY (PR)
+* Target Cluster: CLUS
+* ==================================================================
+
+* 1. Configure TCP Listener
+DEFINE LISTENER('LISTENER.1417') TRPTYPE(TCP) PORT(1417) CONTROL(QMGR) REPLACE
+START LISTENER('LISTENER.1417')
+
+* 2. Partial Repository: No REPOS attribute needed
+* (Cluster state is requested on-demand from Full Repositories)
+
+* 3. Cluster-Receiver Channel (CLUSRCVR)
+* Allows all cluster members to send cluster information and messages to QM4
+DEFINE CHANNEL('TO.QM4') +
+       CHLTYPE(CLUSRCVR) +
+       TRPTYPE(TCP) +
+       CONNAME('localhost(1417)') +
+       CLUSTER('CLUS') +
+       DESCR('Cluster receiver channel for QM4') +
+       REPLACE
+
+* 4. Initial Cluster-Sender Channel(s) (CLUSSDR)
+* Used for initial cluster registration and discovery
+DEFINE CHANNEL('TO.QM1') +
+       CHLTYPE(CLUSSDR) +
+       TRPTYPE(TCP) +
+       CONNAME('localhost(1414)') +
+       CLUSTER('CLUS') +
+       DESCR('Cluster sender channel to QM1') +
+       REPLACE
+DEFINE CHANNEL('TO.QM2') +
+       CHLTYPE(CLUSSDR) +
+       TRPTYPE(TCP) +
+       CONNAME('localhost(1415)') +
+       CLUSTER('CLUS') +
+       DESCR('Cluster sender channel to QM2') +
+       REPLACE
+
+* 5. Define Cluster Queues
+* Workload balancing is enabled using DEFBIND(NOTFIXED)
+DEFINE QLOCAL('Q4') +
+       CLUSTER('CLUS') +
+       DEFBIND(NOTFIXED) +
+       DESCR('Cluster workload-balanced queue for CLUS') +
+       REPLACE
+DEFINE QLOCAL('Q2') +
+       CLUSTER('CLUS') +
+       DEFBIND(NOTFIXED) +
+       DESCR('Cluster workload-balanced queue for CLUS') +
+       REPLACE
+DEFINE QLOCAL('Q1') +
+       CLUSTER('CLUS') +
+       DEFBIND(NOTFIXED) +
+       DESCR('Cluster workload-balanced queue for CLUS') +
+       REPLACE
+DEFINE QLOCAL('Q3') +
+       CLUSTER('CLUS') +
+       DEFBIND(NOTFIXED) +
+       DESCR('Cluster workload-balanced queue for CLUS') +
+       REPLACE

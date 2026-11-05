@@ -1,7 +1,7 @@
 * ==================================================================
 * IBM MQ Cluster Setup Script for Queue Manager: QM3
 * Role: PARTIAL REPOSITORY (PR)
-* Target Cluster: INVOICE_CLUS
+* Target Cluster: CLUS
 * ==================================================================
 
 * 1. Configure TCP Listener
@@ -17,7 +17,7 @@ DEFINE CHANNEL('TO.QM3') +
        CHLTYPE(CLUSRCVR) +
        TRPTYPE(TCP) +
        CONNAME('localhost(1416)') +
-       CLUSTER('INVOICE_CLUS') +
+       CLUSTER('CLUS') +
        DESCR('Cluster receiver channel for QM3') +
        REPLACE
 
@@ -27,21 +27,36 @@ DEFINE CHANNEL('TO.QM1') +
        CHLTYPE(CLUSSDR) +
        TRPTYPE(TCP) +
        CONNAME('localhost(1414)') +
-       CLUSTER('INVOICE_CLUS') +
+       CLUSTER('CLUS') +
        DESCR('Cluster sender channel to QM1') +
        REPLACE
 DEFINE CHANNEL('TO.QM2') +
        CHLTYPE(CLUSSDR) +
        TRPTYPE(TCP) +
        CONNAME('localhost(1415)') +
-       CLUSTER('INVOICE_CLUS') +
+       CLUSTER('CLUS') +
        DESCR('Cluster sender channel to QM2') +
        REPLACE
 
 * 5. Define Cluster Queues
 * Workload balancing is enabled using DEFBIND(NOTFIXED)
-DEFINE QLOCAL('INVOICES.IN') +
-       CLUSTER('INVOICE_CLUS') +
+DEFINE QLOCAL('Q4') +
+       CLUSTER('CLUS') +
        DEFBIND(NOTFIXED) +
-       DESCR('Cluster workload-balanced queue for INVOICE_CLUS') +
+       DESCR('Cluster workload-balanced queue for CLUS') +
+       REPLACE
+DEFINE QLOCAL('Q2') +
+       CLUSTER('CLUS') +
+       DEFBIND(NOTFIXED) +
+       DESCR('Cluster workload-balanced queue for CLUS') +
+       REPLACE
+DEFINE QLOCAL('Q1') +
+       CLUSTER('CLUS') +
+       DEFBIND(NOTFIXED) +
+       DESCR('Cluster workload-balanced queue for CLUS') +
+       REPLACE
+DEFINE QLOCAL('Q3') +
+       CLUSTER('CLUS') +
+       DEFBIND(NOTFIXED) +
+       DESCR('Cluster workload-balanced queue for CLUS') +
        REPLACE
