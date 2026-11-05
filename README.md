@@ -30,7 +30,70 @@ The agent automatically handles repository architecture (Full vs. Partial), CLUS
 
 ---
 
-## 📁 Project Architecture
+## 🌐 FastAPI + LangGraph Web Architecture
+
+In addition to the terminal CLI, the project includes a full **FastAPI** backend coupled with a **LangGraph** state machine.
+
+### LangGraph Agent State Machine:
+```
+           ┌────────────────────────┐
+           │        [START]         │
+           └───────────┬────────────┘
+                       │
+                       ▼
+           ┌────────────────────────┐
+           │     analyze_intent     │
+           └───────────┬────────────┘
+                       │
+         ┌─────────────┼─────────────┐
+         ▼             ▼             ▼
+  [create_cluster] [diagnose]    [general]
+         │             │             │
+         ▼             │             │
+  ┌──────────────┐     │             │
+  │ plan_cluster │     │             │
+  └──────┬───────┘     │             │
+         ▼             │             │
+┌──────────────────┐   │             │
+│ validate_cluster │   │             │
+└────────┬─────────┘   │             │
+         ▼             │             │
+ ┌───────────────┐     │             │
+ │ generate_mqsc │     │             │
+ └───────┬───────┘     │             │
+         │             │             │
+         └─────────────┼─────────────┘
+                       │
+                       ▼
+           ┌────────────────────────┐
+           │        respond         │
+           └───────────┬────────────┘
+                       │
+                       ▼
+           ┌────────────────────────┐
+           │         [END]          │
+           └────────────────────────┘
+```
+
+### Launch the Web UI & API Server:
+```bash
+python cli.py --serve
+# or:
+python api.py
+```
+Open your browser at:
+- **Interactive Web UI**: [http://localhost:8000](http://localhost:8000)
+- **OpenAPI / Swagger Docs**: [http://localhost:8000/docs](http://localhost:8000/docs)
+
+### API Endpoints:
+- `POST /api/chat`: Natural language cluster design & troubleshooting via the LangGraph agent.
+- `POST /api/cluster/plan`: Structured JSON topology planner & auto-wirer.
+- `POST /api/cluster/generate`: Generates MQSC configuration scripts.
+- `GET /api/cluster/docker-preview`: Returns containerized `docker-compose.yml`.
+- `GET /api/cluster/diagnose?query=...`: Diagnostic lookup for IBM MQ cluster errors (`AMQ9448`, `AMQ9202`, etc.).
+- `GET /api/health`: Health status and active cluster indicator.
+
+---
 
 ```
 d:\IBM_MQ_Agent\
