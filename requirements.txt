@@ -1,0 +1,20 @@
+# Requirements for IBM MQ AI Cluster Agent
+
+# Core agent and validation
+pydantic>=2.0.0
+rich>=13.0.0
+requests>=2.31.0
+python-dotenv>=1.0.0
+pyyaml>=6.0.0
+
+# Optional LLM integrations
+google-genai>=2.0.0
+openai>=1.0.0
+langchain>=0.3.0
+langchain-core>=0.3.0
+
+# Optional direct MQ Python interface
+pymqi>=1.12.0
+
+# Testing
+pytest>=8.0.0

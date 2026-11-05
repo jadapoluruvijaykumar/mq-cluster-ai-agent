@@ -1,0 +1,56 @@
+version: '3.8'
+networks:
+  mq-cluster-net:
+    driver: bridge
+services:
+  qm1:
+    image: icr.io/ibm-com/mq:latest
+    container_name: qm1
+    hostname: qm1
+    environment:
+    - LICENSE=accept
+    - MQ_QMGR_NAME=QM1
+    - MQ_ENABLE_METRICS=false
+    - MQ_DEV=true
+    - MQ_ADMIN_PASSWORD=pass
+    ports:
+    - 1414:1414
+    - 9443:9443
+    volumes:
+    - ./mqsc/QM1.mqsc:/etc/mqm/20-cluster.mqsc:ro
+    networks:
+    - mq-cluster-net
+  qm2:
+    image: icr.io/ibm-com/mq:latest
+    container_name: qm2
+    hostname: qm2
+    environment:
+    - LICENSE=accept
+    - MQ_QMGR_NAME=QM2
+    - MQ_ENABLE_METRICS=false
+    - MQ_DEV=true
+    - MQ_ADMIN_PASSWORD=pass
+    ports:
+    - 1415:1414
+    - 9444:9443
+    volumes:
+    - ./mqsc/QM2.mqsc:/etc/mqm/20-cluster.mqsc:ro
+    networks:
+    - mq-cluster-net
+  qm3:
+    image: icr.io/ibm-com/mq:latest
+    container_name: qm3
+    hostname: qm3
+    environment:
+    - LICENSE=accept
+    - MQ_QMGR_NAME=QM3
+    - MQ_ENABLE_METRICS=false
+    - MQ_DEV=true
+    - MQ_ADMIN_PASSWORD=pass
+    ports:
+    - 1416:1414
+    - 9445:9443
+    volumes:
+    - ./mqsc/QM3.mqsc:/etc/mqm/20-cluster.mqsc:ro
+    networks:
+    - mq-cluster-net

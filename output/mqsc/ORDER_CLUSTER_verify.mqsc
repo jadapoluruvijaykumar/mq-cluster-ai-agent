@@ -1,0 +1,14 @@
+* ==================================================================
+* Verification commands for Cluster: ORDER_CLUSTER
+* ==================================================================
+* Check local queue manager state
+DISPLAY QMSTATUS
+
+* Display all known Queue Managers in this cluster
+DISPLAY CLUSQMGR(*) CLUSTER('ORDER_CLUSTER') ALL
+
+* Display cluster channels and operational status
+DISPLAY CHSTATUS('TO.*')
+
+* Display all cluster queues known in the cluster
+DISPLAY QCLUSTER(*) CLUSTER('ORDER_CLUSTER')

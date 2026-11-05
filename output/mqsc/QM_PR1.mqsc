@@ -1,0 +1,47 @@
+* ==================================================================
+* IBM MQ Cluster Setup Script for Queue Manager: QM_PR1
+* Role: PARTIAL REPOSITORY (PR)
+* Target Cluster: ORDER_CLUSTER
+* ==================================================================
+
+* 1. Configure TCP Listener
+DEFINE LISTENER('LISTENER.1416') TRPTYPE(TCP) PORT(1416) CONTROL(QMGR) REPLACE
+START LISTENER('LISTENER.1416')
+
+* 2. Partial Repository: No REPOS attribute needed
+* (Cluster state is requested on-demand from Full Repositories)
+
+* 3. Cluster-Receiver Channel (CLUSRCVR)
+* Allows all cluster members to send cluster information and messages to QM_PR1
+DEFINE CHANNEL('TO.QM_PR1') +
+       CHLTYPE(CLUSRCVR) +
+       TRPTYPE(TCP) +
+       CONNAME('localhost(1416)') +
+       CLUSTER('ORDER_CLUSTER') +
+       DESCR('Cluster receiver channel for QM_PR1') +
+       REPLACE
+
+* 4. Initial Cluster-Sender Channel(s) (CLUSSDR)
+* Used for initial cluster registration and discovery
+DEFINE CHANNEL('TO.QM_FR1') +
+       CHLTYPE(CLUSSDR) +
+       TRPTYPE(TCP) +
+       CONNAME('localhost(1414)') +
+       CLUSTER('ORDER_CLUSTER') +
+       DESCR('Cluster sender channel to QM_FR1') +
+       REPLACE
+DEFINE CHANNEL('TO.QM_FR2') +
+       CHLTYPE(CLUSSDR) +
+       TRPTYPE(TCP) +
+       CONNAME('localhost(1415)') +
+       CLUSTER('ORDER_CLUSTER') +
+       DESCR('Cluster sender channel to QM_FR2') +
+       REPLACE
+
+* 5. Define Cluster Queues
+* Workload balancing is enabled using DEFBIND(NOTFIXED)
+DEFINE QLOCAL('ORDERS.IN') +
+       CLUSTER('ORDER_CLUSTER') +
+       DEFBIND(NOTFIXED) +
+       DESCR('Cluster workload-balanced queue for ORDER_CLUSTER') +
+       REPLACE
